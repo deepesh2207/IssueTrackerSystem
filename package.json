@@ -1,0 +1,25 @@
+{
+  "name": "issuetrackersystem",
+  "version": "1.0.0",
+  "description": "a website to track users issues like jira",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node gateway/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deepesh2207/IssueTrackerSystem.git"
+  },
+  "author": "Deepesh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/deepesh2207/IssueTrackerSystem/issues"
+  },
+  "homepage": "https://github.com/deepesh2207/IssueTrackerSystem#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongoose": "^8.16.4",
+    "nodemon": "^3.1.10"
+  }
+}
