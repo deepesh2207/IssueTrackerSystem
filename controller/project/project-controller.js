@@ -40,22 +40,30 @@ async function createProject(req, res){
         res.status(500).json({message: error.message});
     }
 }
-async function getAllProjects(req, res){
-    try{
-        const allProjects = await Project.find();
+async function getAllProjects(req, res) {
+    try {
+        // Find all projects and populate their issues
+        let allProjects = await Project.find().populate('issues');
         
         // Check if any projects exist
         if (!allProjects || allProjects.length === 0) {
             return res.status(200).json({
                 message: "No projects found",
+                count: 0,
                 data: []
             });
         }
         
+        // Transform the projects to include issue count
+        const projectsWithIssueCount = allProjects.map(project => ({
+            ...project.toObject(),
+            issueCount: project.issues ? project.issues.length : 0
+        }));
+        
         res.status(200).json({
             message: "Projects retrieved successfully",
             count: allProjects.length,
-            data: allProjects
+            data: projectsWithIssueCount
         });
     }
     catch(error){
@@ -94,7 +102,7 @@ async function getProjectById(req, res){
             });
         }
         
-        const project = await Project.findById(id);
+        const project = await Project.findById(id).populate('issues');
         
         // Check if project exists
         if (!project) {
@@ -104,9 +112,15 @@ async function getProjectById(req, res){
             });
         }
         
+        // Add issue count to the response
+        const projectWithIssueCount = {
+            ...project.toObject(),
+            issueCount: project.issues ? project.issues.length : 0
+        };
+        
         res.status(200).json({
             message: "Project retrieved successfully",
-            data: project
+            data: projectWithIssueCount
         });
     }
     catch(error){
@@ -128,7 +142,14 @@ async function getProjectById(req, res){
 }
 async function updateProject(req, res){
     try{
-        const project =  await Project.findByIdAndUpdate(req.params.id, req.body);
+        const existingProject = await Project.findById(req.params.id);
+        if (!existingProject) {
+            return res.status(404).json({
+                message: 'Project not found',
+                id: req.params.id
+            });
+        }
+        const project =  await Project.findByIdAndUpdate(req.params.id, req.body, {new:true});
         res.status(200).json(project);
     }
     catch(error){
@@ -138,7 +159,14 @@ async function updateProject(req, res){
 }
 async function deleteProjectById(req,res){
     try{
-        const project = await Project.findByIdAndDelete(req.params.id)
+        const existingProject = await Project.findById(req.params.id);
+        if (!existingProject) {
+            return res.status(404).json({
+                message: 'Project not found',
+                id: req.params.id
+            });
+        }
+        const project = await Project.findByIdAndDelete(req.params.id, {new:true});
         res.status(200).json(project);
     }
     catch(error){

@@ -1,7 +1,8 @@
 const express = require('express');
 const app = express();
 const connectDB = require('../connect');
-const router = require('../routes/project-routes');
+const projectRoutes = require('../routes/project-routes');
+const issueRoutes = require('../routes/issue-routes');
 
 // JSON parsing middleware with error handling
 app.use(express.json());
@@ -18,8 +19,14 @@ app.use((error, req, res, next) => {
 });
 
 connectDB();
-app.use('/project', router);
-app.use('/project/:id', router);
+
+// Project routes
+app.use('/project', projectRoutes);
+app.use('/project/:id', projectRoutes);
+
+// Issue routes
+app.use('/issue', issueRoutes);
+app.use('/issue/:id', issueRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
